@@ -10,6 +10,7 @@
 using namespace cv;
 using namespace std;
 
+// Structure to store PCD file format data
 typedef struct {
 	float x;
 	float y;
@@ -17,6 +18,9 @@ typedef struct {
 	float rgb;
 	int index;
 } PCDFile;
+
+// Function prototype declarations
+void drawGraspRectangle(Mat& image, vector<Point2f>& point);
 
 cv::Point2f rotate2d(const cv::Point2f& inPoint, const double& angRad)
 {
@@ -49,83 +53,99 @@ float angleBetween(const Point &v1, const Point &v2)
 		return acos(a); // 0..PI
 }
 
-// Draw grasp rectangle
+//// Draw grasp rectangle
+//void drawGraspRectangle(Mat& image, vector<Point2f>& point)
+//{
+//	Mat save = image.clone();
+//	Mat original = image.clone();
+//	//cvtColor(image, image, CV_BGR2GRAY);
+//	Canny(image, image, 10, 90, 3);
+//	for (int i = 0; i < point.size(); i += 4)
+//	{
+//		Mat copy = original.clone();
+//		/*	line(image, point[i], point[i + 1], Scalar(255, 0, 0));
+//		line(image, point[i + 1], point[i + 2], Scalar(0, 0, 255));
+//		line(image, point[i + 2], point[i + 3], Scalar(255, 0, 0));
+//		line(image, point[i + 3], point[i], Scalar(0, 0, 255));*/
+//		//line(image, point[i], point[i + 1], Scalar(0, 0, 255));
+//		//line(image, point[i + 1], point[i + 2], Scalar(0, 0, 255));
+//		//line(image, point[i + 2], point[i + 3], Scalar(0, 0, 255));
+//		//line(image, point[i + 3], point[i], Scalar(0, 0, 255));
+//
+//		vector<Point2f> src;
+//		src.push_back(point[i]);
+//		src.push_back(point[i + 1]);
+//		src.push_back(point[i + 2]);
+//		src.push_back(point[i + 3]);
+//		vector<Point2f> dst;
+//		dst.push_back(Point2f(0, 0));
+//		dst.push_back(Point2f(0, 300));
+//		dst.push_back(Point2f(300, 300));
+//		dst.push_back(Point2f(300, 0));
+//
+//		Mat m = getPerspectiveTransform(src, dst);
+//		Mat oman;
+//		warpPerspective(image, oman, m, Size(300, 300));
+//		//cvtColor(oman, oman, CV_BGR2GRAY);
+//		//blur(oman, oman, Size(3, 3));
+//		//Canny(oman, oman, 0, 30, 3);
+//		String omanman = "oman" + to_string(i + 1);
+//		imshow(omanman, oman);
+//
+//		//line(copy, point[i], point[i + 1], Scalar(255, 0, 0));
+//		//line(copy, point[i + 1], point[i + 2], Scalar(0, 0, 255));
+//		//line(copy, point[i + 2], point[i + 3], Scalar(255, 0, 0));
+//		//line(copy, point[i + 3], point[i], Scalar(0, 0, 255));
+//		////if (i == 1) {
+//		//	Vec2f v = Vec2f(point[i].x - point[i + 1].x, point[i].y - point[i + 1].y);
+//		//	float angle = angleBetween(Point(v[0], v[1]), Point(1, 0));
+//		//	angle = angle * 180.0f / 3.1415;
+//		//	if (angle >= 90)
+//		//		angle = 180.0f - angle;
+//		//	//RotatedRect rect = RotatedRect(point[i + 3], point[i + 2], point[i + 1]);
+//		//	//cout << rect.angle << endl;
+//		//	Mat affine_matrix = getRotationMatrix2D(point[i], angle, 1.0f);
+//		//	Mat rotated_img;
+//		//	Mat rotated_img2;
+//		//	warpAffine(copy, rotated_img, affine_matrix, image.size());
+//		//	warpAffine(save, rotated_img2, affine_matrix, image.size());
+//		//	//cvtColor(rotated_img2, rotated_img2, CV_BGR2GRAY);
+//		//	GaussianBlur(rotated_img2, rotated_img2,Size(9,7),8,6);
+//		//	equalizeHist(rotated_img2, rotated_img2);
+//		//	//threshold(rotated_img2, rotated_img2, 210, 255, CV_THRESH_BINARY);
+//		//	String window = "Rotated image" + to_string(i + 1) + ".jpg";
+//		//	//if(i == 0)
+//		//	Point2f rotated_pt = rotatePoint(point[i + 2], point[i], -angle * 3.1415 / 180.0f);
+//		//	Mat cut_img(rotated_img2, Rect(rotated_pt, point[i]));
+//		//	//equalizeHist(cut_img, cut_img);
+//		//	imwrite(window, cut_img);
+//		//	//imwrite(window, rotated_img2);
+//		//	//if(point[i].x < rotated_pt.x)
+//		//		//Point2f 
+//		//	window = "Rotated image" + to_string(i + 1);
+//		//	circle(rotated_img, rotated_pt,10,Scalar(255,255,0));
+//		//	circle(rotated_img, point[i],10,Scalar(255,255,0));
+//		//	//String window = "Rotated image" + to_string(i + 1);
+//		//	cout << window << endl;
+//		//	cout << angle << endl;
+//		//	imshow(window, rotated_img);
+//		//}
+//	}
+//
+//}
+
+
+// Function to draw grasp rectangle
 void drawGraspRectangle(Mat& image, vector<Point2f>& point)
 {
-	Mat save = image.clone();
-	Mat original = image.clone();
-	//cvtColor(image, image, CV_BGR2GRAY);
-	Canny(image, image, 10, 90, 3);
 	for (int i = 0; i < point.size(); i += 4)
 	{
-		Mat copy = original.clone();
-		/*	line(image, point[i], point[i + 1], Scalar(255, 0, 0));
+		// Draw grasp rectangle
+		// If points are positive red lines are to grasp
+		line(image, point[i], point[i + 1], Scalar(255, 0, 0));
 		line(image, point[i + 1], point[i + 2], Scalar(0, 0, 255));
 		line(image, point[i + 2], point[i + 3], Scalar(255, 0, 0));
-		line(image, point[i + 3], point[i], Scalar(0, 0, 255));*/
-		//line(image, point[i], point[i + 1], Scalar(0, 0, 255));
-		//line(image, point[i + 1], point[i + 2], Scalar(0, 0, 255));
-		//line(image, point[i + 2], point[i + 3], Scalar(0, 0, 255));
-		//line(image, point[i + 3], point[i], Scalar(0, 0, 255));
-
-		vector<Point2f> src;
-		src.push_back(point[i]);
-		src.push_back(point[i + 1]);
-		src.push_back(point[i + 2]);
-		src.push_back(point[i + 3]);
-		vector<Point2f> dst;
-		dst.push_back(Point2f(0, 0));
-		dst.push_back(Point2f(0, 300));
-		dst.push_back(Point2f(300, 300));
-		dst.push_back(Point2f(300, 0));
-
-		Mat m = getPerspectiveTransform(src, dst);
-		Mat oman;
-		warpPerspective(image, oman, m, Size(300, 300));
-		//cvtColor(oman, oman, CV_BGR2GRAY);
-		//blur(oman, oman, Size(3, 3));
-		//Canny(oman, oman, 0, 30, 3);
-		String omanman = "oman" + to_string(i + 1);
-		imshow(omanman, oman);
-
-		//line(copy, point[i], point[i + 1], Scalar(255, 0, 0));
-		//line(copy, point[i + 1], point[i + 2], Scalar(0, 0, 255));
-		//line(copy, point[i + 2], point[i + 3], Scalar(255, 0, 0));
-		//line(copy, point[i + 3], point[i], Scalar(0, 0, 255));
-		////if (i == 1) {
-		//	Vec2f v = Vec2f(point[i].x - point[i + 1].x, point[i].y - point[i + 1].y);
-		//	float angle = angleBetween(Point(v[0], v[1]), Point(1, 0));
-		//	angle = angle * 180.0f / 3.1415;
-		//	if (angle >= 90)
-		//		angle = 180.0f - angle;
-		//	//RotatedRect rect = RotatedRect(point[i + 3], point[i + 2], point[i + 1]);
-		//	//cout << rect.angle << endl;
-		//	Mat affine_matrix = getRotationMatrix2D(point[i], angle, 1.0f);
-		//	Mat rotated_img;
-		//	Mat rotated_img2;
-		//	warpAffine(copy, rotated_img, affine_matrix, image.size());
-		//	warpAffine(save, rotated_img2, affine_matrix, image.size());
-		//	//cvtColor(rotated_img2, rotated_img2, CV_BGR2GRAY);
-		//	GaussianBlur(rotated_img2, rotated_img2,Size(9,7),8,6);
-		//	equalizeHist(rotated_img2, rotated_img2);
-		//	//threshold(rotated_img2, rotated_img2, 210, 255, CV_THRESH_BINARY);
-		//	String window = "Rotated image" + to_string(i + 1) + ".jpg";
-		//	//if(i == 0)
-		//	Point2f rotated_pt = rotatePoint(point[i + 2], point[i], -angle * 3.1415 / 180.0f);
-		//	Mat cut_img(rotated_img2, Rect(rotated_pt, point[i]));
-		//	//equalizeHist(cut_img, cut_img);
-		//	imwrite(window, cut_img);
-		//	//imwrite(window, rotated_img2);
-		//	//if(point[i].x < rotated_pt.x)
-		//		//Point2f 
-		//	window = "Rotated image" + to_string(i + 1);
-		//	circle(rotated_img, rotated_pt,10,Scalar(255,255,0));
-		//	circle(rotated_img, point[i],10,Scalar(255,255,0));
-		//	//String window = "Rotated image" + to_string(i + 1);
-		//	cout << window << endl;
-		//	cout << angle << endl;
-		//	imshow(window, rotated_img);
-		//}
+		line(image, point[i + 3], point[i], Scalar(0, 0, 255));
 	}
 
 }
@@ -142,7 +162,7 @@ int main(int argc, char** argv)
 	}
 
 	String fileIndex = argv[1];
-	// Read the point cloud data
+	// Read the PCD file
 	String filename = "pcd0" + fileIndex + ".txt";
 	ifstream ifs(filename);
 	if (ifs.fail())
@@ -156,7 +176,7 @@ int main(int argc, char** argv)
 	ifstream ifs2(filename);
 	if (ifs2.fail())
 	{
-		cout << "Could not open the positive grasp ractangle data" << endl;
+		cout << "Could not open " << filename << endl;
 		return -1;
 	}
 
@@ -165,27 +185,32 @@ int main(int argc, char** argv)
 	ifstream ifs3(filename);
 	if (ifs3.fail())
 	{
-		cout << "Could not open the negative grasp ractangle data" << endl;
+		cout << "Could not open " << filename << endl;
 		return -1;
 	}
-
-	Mat depth32F_img = Mat(480, 640, CV_32FC1);
-	Mat depth_img = Mat(480, 640, CV_8UC1);
 
 	// Read color image
 	filename = "pcd0" + fileIndex + "r.png";
 	Mat color_img = imread(filename);
+	if (color_img.empty())
+	{
+		cout << "Could not open" << filename << endl;
+	}
 
 	// Make depth image from point cloud data
+	Mat depth32F_img = Mat(480, 640, CV_32FC1);
+	Mat depth_img = Mat(480, 640, CV_8UC1);
 	vector<PCDFile> pcd;
 	int i = 1;
 	int row, col;
 	for (string line; getline(ifs, line);)
 	{
+		// Ignore first ten lines
 		if (i > 10) {
 			istringstream s(line);
 			PCDFile tmp;
 			s >> tmp.x >> tmp.y >> tmp.z >> tmp.rgb >> tmp.index;
+			// Calculate row and colum indices from tmp.index (see readme in cornell grasp dataset)
 			row = floor(tmp.index / 640) + 1;
 			col = (tmp.index % 640) + 1;
 
@@ -220,22 +245,24 @@ int main(int argc, char** argv)
 
 	// Show raw images
 	namedWindow("Raw depth image", WINDOW_AUTOSIZE);
-	//namedWindow("Raw color image", WINDOW_AUTOSIZE);
+	namedWindow("Raw color image", WINDOW_AUTOSIZE);
 	imshow("Raw depth image", depth_img);
-	//imshow("Raw color image", color_img);
+	imshow("Raw color image", color_img);
 
 	Mat neg_depth_img = depth_img.clone();
 	Mat neg_color_img = color_img.clone();
 
 	// Draw positive grasp rectangle on images
-	drawGraspRectangle(depth_img, point);
-	//drawGraspRectangle(color_img, point);
+	Mat pos_color_img = color_img.clone();
+	Mat pos_depth_img = depth_img.clone();
+	drawGraspRectangle(pos_color_img, point);
+	drawGraspRectangle(pos_depth_img, point);
 
 	// Show images with positive rectangles
 	namedWindow("Depth image with grasp rectangle", WINDOW_AUTOSIZE);
-	//namedWindow("Color image with grasp rectangle", WINDOW_AUTOSIZE);
-	imshow("Depth image with grasp rectangle", depth_img);
-	//imshow("Color image with grasp rectangle", color_img);
+	namedWindow("Color image with grasp rectangle", WINDOW_AUTOSIZE);
+	imshow("Depth image with grasp rectangle", pos_depth_img);
+	imshow("Color image with grasp rectangle", pos_color_img);
 	//imwrite("training.jpg", color_img);
 	//// Draw negative grasp rectangle on images
 	//drawGraspRectangle(neg_depth_img, negativePoint);
