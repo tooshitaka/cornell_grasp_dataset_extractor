@@ -249,9 +249,6 @@ int main(int argc, char** argv)
 	imshow("Raw depth image", depth_img);
 	imshow("Raw color image", color_img);
 
-	Mat neg_depth_img = depth_img.clone();
-	Mat neg_color_img = color_img.clone();
-
 	// Draw positive grasp rectangle on images
 	Mat pos_color_img = color_img.clone();
 	Mat pos_depth_img = depth_img.clone();
@@ -265,14 +262,16 @@ int main(int argc, char** argv)
 	imshow("Color image with grasp rectangle", pos_color_img);
 	//imwrite("training.jpg", color_img);
 	//// Draw negative grasp rectangle on images
-	//drawGraspRectangle(neg_depth_img, negativePoint);
-	//drawGraspRectangle(neg_color_img, negativePoint);
+	Mat neg_depth_img = depth_img.clone();
+	Mat neg_color_img = color_img.clone();
+	drawGraspRectangle(neg_depth_img, negativePoint);
+	drawGraspRectangle(neg_color_img, negativePoint);
 
 	//// Show images with rectangles
-	//namedWindow("Depth image with negative grasp rectangle", WINDOW_AUTOSIZE);
-	//namedWindow("Color image with negative grasp rectangle", WINDOW_AUTOSIZE);
-	//imshow("Depth image with negative grasp rectangle", neg_depth_img);
-	//imshow("Color image with negative grasp rectangle", neg_color_img);
+	namedWindow("Depth image with negative grasp rectangle", WINDOW_AUTOSIZE);
+	namedWindow("Color image with negative grasp rectangle", WINDOW_AUTOSIZE);
+	imshow("Depth image with negative grasp rectangle", neg_depth_img);
+	imshow("Color image with negative grasp rectangle", neg_color_img);
 
 	waitKey(0);
 
